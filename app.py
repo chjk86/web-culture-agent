@@ -3,6 +3,10 @@ import streamlit as st
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
+# Streamlit Cloud의 Secrets를 os.environ에도 반영 (로컬 .env와 동일하게 동작하도록)
+for key, value in st.secrets.items():
+    os.environ[key] = str(value)
+
 from langchain.chat_models import init_chat_model
 from langchain_core.tools import tool
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage, ToolMessage
