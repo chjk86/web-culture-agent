@@ -7,9 +7,6 @@ load_dotenv(override=True)
 for key, value in st.secrets.items():
     os.environ[key] = str(value)
 
-# 디버그용 — 나중에 지울 것
-st.write(f"GOOGLE_API_KEY 존재: {'GOOGLE_API_KEY' in os.environ}, 길이: {len(os.environ.get('GOOGLE_API_KEY', ''))}")
-
 from langchain.chat_models import init_chat_model
 from langchain_core.tools import tool
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage, ToolMessage
