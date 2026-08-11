@@ -1,0 +1,8 @@
+streamlit
+langchain
+langchain-google-genai
+langgraph
+tavily-python
+youtube-search
+requests
+python-dotenv
