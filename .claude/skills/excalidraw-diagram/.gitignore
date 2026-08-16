@@ -2,3 +2,4 @@
 *.png
 uv.lock
 __pycache__/
+references/vendor/

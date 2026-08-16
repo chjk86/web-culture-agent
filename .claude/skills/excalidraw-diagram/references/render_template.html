@@ -13,7 +13,14 @@
   <div id="root"></div>
 
   <script type="module">
-    import { exportToSvg } from "https://esm.sh/@excalidraw/excalidraw?bundle";
+    // Prefer a locally vendored bundle (see vendor/README) so rendering works
+    // offline / behind network policies that block esm.sh. Falls back to the CDN.
+    let exportToSvg;
+    try {
+      ({ exportToSvg } = await import("./vendor/excalidraw-bundle.js"));
+    } catch {
+      ({ exportToSvg } = await import("https://esm.sh/@excalidraw/excalidraw?bundle"));
+    }
 
     window.renderDiagram = async function(jsonData) {
       try {

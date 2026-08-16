@@ -16,6 +16,9 @@ import argparse
 import os
 import json
 import sys
+import threading
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 
@@ -146,7 +149,19 @@ def render(
         print(f"ERROR: Template not found at {template_path}", file=sys.stderr)
         sys.exit(1)
 
-    template_url = template_path.as_uri()
+    # Serve the template over http://127.0.0.1 rather than file:// — ES module
+    # imports (including the vendored bundle) are CORS-blocked on file:// origins.
+    class _QuietHandler(SimpleHTTPRequestHandler):
+        def log_message(self, *args):  # keep stdout clean for the caller
+            pass
+
+    httpd = ThreadingHTTPServer(
+        ("127.0.0.1", 0),
+        partial(_QuietHandler, directory=str(template_path.parent)),
+    )
+    httpd.daemon_threads = True
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    template_url = f"http://127.0.0.1:{httpd.server_address[1]}/{template_path.name}"
 
     with sync_playwright() as p:
         try:
@@ -196,6 +211,8 @@ def render(
 
         svg_el.screenshot(path=str(output_path))
         browser.close()
+
+    httpd.shutdown()
 
     return output_path
 
